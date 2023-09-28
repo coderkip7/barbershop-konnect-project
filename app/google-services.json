@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "986966923988",
+    "project_id": "barbershop-konnect",
+    "storage_bucket": "barbershop-konnect.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:986966923988:android:284484f353bb5f00c67941",
+        "android_client_info": {
+          "package_name": "com.example.barbershopkonnect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKVCxsrwe-U0aL35krFam7_H7-Js2w4ys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
