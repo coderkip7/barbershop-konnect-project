@@ -8,6 +8,26 @@ import com.example.barbershopkonnect.ui.theme.screens.products.Service
 import com.example.barbershopkonnect.ui.theme.screens.products.barbers
 import com.example.barbershopkonnect.ui.theme.screens.products.barbershops
 import com.example.barbershopkonnect.ui.theme.screens.products.services
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.DatabaseReference
+
+
+data class Booking(
+    val barberShop: String,
+    val barber: Barber,
+    val service: Service,
+    val date: String,
+    val time: String
+)
+
+data class BookingData(
+    val barberShop: String = "",
+    val barberName: String = "",
+    val serviceName: String = "",
+    val date: String = "",
+    val time: String = ""
+)
 
 class BookingViewModel : ViewModel() {
     private val _selectedBarberShop = MutableLiveData<String>()
@@ -27,6 +47,12 @@ class BookingViewModel : ViewModel() {
 
     private val _bookingConfirmed = MutableLiveData<Boolean>()
     val bookingConfirmed: LiveData<Boolean> = _bookingConfirmed
+
+    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    private val bookingsRef: DatabaseReference =
+        database.getReference("bookings") // Replace with your Firebase Realtime Database reference
 
     init {
         _selectedBarberShop.value = barbershops[0]
@@ -59,5 +85,27 @@ class BookingViewModel : ViewModel() {
 
     fun setBookingConfirmed(confirmed: Boolean) {
         _bookingConfirmed.value = confirmed
+    }
+
+    fun saveBookingToFirebase() {
+        val booking = BookingData(
+            barberShop = selectedBarberShop.value ?: "",
+            barberName = selectedBarber.value?.name ?: "",
+            serviceName = selectedService.value?.name ?: "",
+            date = selectedDate.value ?: "",
+            time = selectedTime.value ?: ""
+        )
+
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val userBookingRef = bookingsRef.child(currentUser.uid).push()
+            userBookingRef.setValue(booking)
+                .addOnSuccessListener {
+                    setBookingConfirmed(true)
+                }
+                .addOnFailureListener {
+                    setBookingConfirmed(false)
+                }
+        }
     }
 }

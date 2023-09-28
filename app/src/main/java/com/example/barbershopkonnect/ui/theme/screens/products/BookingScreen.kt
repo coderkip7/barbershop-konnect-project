@@ -3,6 +3,7 @@ package com.example.barbershopkonnect.ui.theme.screens.products
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -49,84 +50,104 @@ fun BookingScreen(
     var selectedTime by remember { mutableStateOf(TextFieldValue()) }
     var bookingConfirmed by remember { mutableStateOf(false) }
 
-    Column(
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
     ) {
-        if (bookingConfirmed) {
-            BookingConfirmation(
-                selectedBarberShop,
-                selectedBarber,
-                selectedService,
-                selectedDate.text,
-                selectedTime.text
-            )
-        } else {
-            Text(text = "Select Barber Shop:")
-            RadioGroup(
-                options = barbershops,
-                selectedOption = selectedBarberShop,
-                onOptionSelected = { selectedBarberShop = it }
-            )
-
-            Text(text = "Select Barber:")
-            RadioGroup(
-                options = barbers.map { it.name },
-                selectedOption = selectedBarber.name,
-                onOptionSelected = { selectedBarber = barbers.first { barber -> barber.name == it } }
-            )
-
-            Text(text = "Select Service:")
-            RadioGroup(
-                options = services.map { "${it.name} - ${it.price} KES" },
-                selectedOption = "${selectedService.name} - ${selectedService.price} KES",
-                onOptionSelected = { selectedService = services.first { service -> "${service.name} - ${service.price} KES" == it } }
-            )
-
-            Text(text = "Select Date:")
-            BasicTextField(
-                value = selectedDate.text,
-                onValueChange = {
-                    selectedDate = TextFieldValue(it)
-                },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, color = Color.Gray)
-                    .padding(4.dp)
-            )
-
-            Text(text = "Select Time:")
-            BasicTextField(
-                value = selectedTime.text,
-                onValueChange = {
-                    selectedTime = TextFieldValue(it)
-                },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, color = Color.Gray)
-                    .padding(4.dp)
-            )
-
-            Button(
-                onClick = {
-                    val booking = Booking(
-                        selectedBarberShop,
-                        selectedBarber,
-                        selectedService,
-                        selectedDate.text,
-                        selectedTime.text
-                    )
-                    bookingConfirmed = true
+        item {
+            if (bookingConfirmed) {
+                BookingConfirmation(
+                    selectedBarberShop,
+                    selectedBarber,
+                    selectedService,
+                    selectedDate.text,
+                    selectedTime.text
+                ) {
+                    bookingConfirmed = false
                 }
-            ) {
-                Text(text = "Book Now")
+            } else {
+                Text(text = "Select Barber Shop:")
+                RadioGroup(
+                    options = barbershops,
+                    selectedOption = selectedBarberShop,
+                    onOptionSelected = { selectedBarberShop = it }
+                )
+
+                Text(text = "Select Barber:")
+                RadioGroup(
+                    options = barbers.map { it.name },
+                    selectedOption = selectedBarber.name,
+                    onOptionSelected = { selectedBarber = barbers.first { barber -> barber.name == it } }
+                )
+
+                Text(text = "Select Service:")
+                RadioGroup(
+                    options = services.map { "${it.name} - ${it.price} KES" },
+                    selectedOption = "${selectedService.name} - ${selectedService.price} KES",
+                    onOptionSelected = { selectedService = services.first { service -> "${service.name} - ${service.price} KES" == it } }
+                )
+
+                Text(text = "Select Date:")
+                BasicTextField(
+                    value = selectedDate.text,
+                    onValueChange = {
+                        selectedDate = TextFieldValue(it)
+                    },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, color = Color.Gray)
+                        .padding(4.dp)
+                )
+
+                Text(text = "Select Time:")
+                BasicTextField(
+                    value = selectedTime.text,
+                    onValueChange = {
+                        selectedTime = TextFieldValue(it)
+                    },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, color = Color.Gray)
+                        .padding(4.dp)
+                )
+
+                Button(
+                    onClick = {
+                        val booking = Booking(
+                            selectedBarberShop,
+                            selectedBarber,
+                            selectedService,
+                            selectedDate.text,
+                            selectedTime.text
+                        )
+                        bookingConfirmed = true
+                    }
+                ) {
+                    Text(text = "Book Now")
+                }
             }
         }
+    }
+
+    LaunchedEffect(bookingConfirmed) {
+        if (bookingConfirmed) {
+            snackbarHostState.showSnackbar("Booking confirmed")
+        }
+    }
+
+    SnackbarHost(
+        hostState = snackbarHostState,
+        modifier = Modifier.padding(16.dp)
+    ) { snackbarData ->
+        Snackbar(
+            snackbarData = snackbarData,
+            modifier = Modifier.padding(8.dp)
+        )
     }
 }
 
@@ -136,7 +157,8 @@ fun BookingConfirmation(
     barber: Barber,
     service: Service,
     date: String,
-    time: String
+    time: String,
+    onConfirmBooking: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -152,6 +174,7 @@ fun BookingConfirmation(
 
         Button(
             onClick = {
+                onConfirmBooking()
             }
         ) {
             Text(text = "Confirm Booking")

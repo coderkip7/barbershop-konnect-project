@@ -72,6 +72,9 @@ class AuthViewModel(var navController: NavHostController, var context: Context){
         }
 
     }
+    fun isUserAuthenticated(): Boolean {
+        return mAuth.currentUser != null
+    }
     fun logout(){
         mAuth.signOut()
         navController.navigate(ROUTE_LOGIN)

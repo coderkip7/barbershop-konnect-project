@@ -52,7 +52,7 @@ fun HomeScreen(navController: NavHostController) {
             Text(text = "Booking")
         }
         Spacer(modifier = Modifier.height(100.dp))
-        Image(painter = painterResource(id = R.drawable.bbshop2),
+        Image(painter = painterResource(id = R.drawable.bbshop1),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxSize()
